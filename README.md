@@ -74,7 +74,7 @@ The Daily Racing Form educates. Track Intel orients. The layout strips everythin
 
 A subscriber should be able to open it, scan it, and feel oriented before coffee goes cold.
 
-![Track Intel Sheet](design/screenshots/sheet-preview.png)
+![Track Intel Sheet](screenshot.png)
 
 ---
 
