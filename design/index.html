@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Intel — Expert Approval Interface</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-deep: #1a3028;
+    --green-mid: #2a4a3a;
+    --green-accent: #3d7a5e;
+    --green-light: #e8f2ed;
+    --gold: #c9a84c;
+    --gold-light: #f5edd6;
+    --cream: #faf8f3;
+    --ink: #1a1a18;
+    --ink-mid: #4a4a46;
+    --ink-light: #8a8a84;
+    --border: #d6d2c8;
+    --border-light: #ede9e0;
+    --white: #ffffff;
+    --teal: #00bfa6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Instrument Sans', sans-serif;
+    background: #0a0f0d;
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── DEMO CHROME ── */
+  .demo-chrome {
+    background: #0a0f0d;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .demo-step {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .demo-step strong {
+    color: var(--teal);
+    font-weight: 600;
+  }
+
+  .demo-badge {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.25);
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+
+  .demo-pipeline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .pipeline-step {
+    width: 24px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.1);
+    transition: background 0.4s ease;
+  }
+
+  .pipeline-step.done { background: var(--teal); }
+  .pipeline-step.active { background: var(--gold); }
+
+  /* ── SCREENS ── */
+  .screen {
+    display: none;
+    flex: 1;
+  }
+
+  .screen.active {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── APPROVAL SCREEN ── */
+  .approval-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    background: #0a0f0d;
+  }
+
+  .approval-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 0.5px solid rgba(0,0,0,0.12);
+    max-width: 520px;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+  }
+
+  .approval-header {
+    background: #0a2a1f;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .approval-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .approval-logo {
+    width: 28px;
+    height: 28px;
+    background: var(--teal);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .approval-title {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+  }
+
+  .approval-track {
+    color: var(--teal);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+
+  .approval-intro {
+    padding: 20px;
+    border-bottom: 0.5px solid rgba(0,0,0,0.08);
+  }
+
+  .approval-intro-label {
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .approval-intro-text {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.5;
+  }
+
+  .best-bet-section {
+    padding: 16px 20px;
+    border-bottom: 0.5px solid rgba(0,0,0,0.08);
+  }
+
+  .section-label {
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .best-bet-card {
+    background: #f9f9f7;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+
+  .best-bet-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .best-bet-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: #0a0a0a;
+  }
+
+  .best-bet-odds {
+    font-size: 13px;
+    color: var(--teal);
+    font-weight: 500;
+  }
+
+  .best-bet-meta {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 8px;
+  }
+
+  .best-bet-analysis {
+    font-size: 13px;
+    color: #555;
+    font-style: italic;
+    line-height: 1.5;
+    border-left: 2px solid var(--teal);
+    padding-left: 10px;
+  }
+
+  .send-times {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f9f9f7;
+    border-radius: 8px;
+    padding: 8px 12px;
+    border: 0.5px solid rgba(0,0,0,0.1);
+  }
+
+  .send-times-text {
+    font-size: 12px;
+    color: #555;
+  }
+
+  .races-section {
+    padding: 16px 20px;
+    border-bottom: 0.5px solid rgba(0,0,0,0.08);
+  }
+
+  .race-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .race-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    background: #f9f9f7;
+    border-radius: 7px;
+  }
+
+  .race-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .race-num-label {
+    font-size: 11px;
+    color: #999;
+    min-width: 20px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .race-pick-name {
+    font-size: 13px;
+    color: #0a0a0a;
+  }
+
+  .race-pick-odds {
+    font-size: 12px;
+    color: #555;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .race-more {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: 7px;
+    border: 0.5px solid rgba(0,0,0,0.1);
+    color: #999;
+    cursor: pointer;
+  }
+
+  .race-more span { font-size: 12px; }
+
+  /* ACTIONS */
+  .approval-actions {
+    padding: 16px 20px;
+  }
+
+  .action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .btn-approve {
+    padding: 11px;
+    border-radius: 8px;
+    border: 1px solid var(--teal);
+    background: transparent;
+    color: var(--teal);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Instrument Sans', sans-serif;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .btn-approve:hover, .btn-approve.pressed {
+    background: var(--teal);
+    color: #fff;
+  }
+
+  .btn-flag, .btn-hold {
+    padding: 11px;
+    border-radius: 8px;
+    border: 0.5px solid rgba(0,0,0,0.15);
+    background: transparent;
+    color: #555;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Instrument Sans', sans-serif;
+    transition: background 0.15s;
+  }
+
+  .btn-flag:hover, .btn-hold:hover { background: #f5f5f3; }
+
+  .status-msg {
+    font-size: 12px;
+    text-align: center;
+    color: transparent;
+    min-height: 18px;
+    transition: color 0.3s;
+  }
+
+  .status-msg.show { color: var(--teal); }
+
+  /* ── SENDING SCREEN ── */
+  .sending-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #0a0f0d;
+    gap: 24px;
+    padding: 40px;
+  }
+
+  .sending-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: rgba(0,191,166,0.12);
+    border: 1px solid rgba(0,191,166,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sending-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: #fff;
+    text-align: center;
+  }
+
+  .sending-title em {
+    color: var(--teal);
+    font-style: italic;
+  }
+
+  .sending-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .sending-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.35s ease, transform 0.35s ease, background 0.3s ease;
+  }
+
+  .sending-step.vis {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .sending-step.done {
+    background: rgba(0,191,166,0.06);
+    border-color: rgba(0,191,166,0.2);
+  }
+
+  .step-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    flex-shrink: 0;
+    transition: background 0.3s ease;
+  }
+
+  .sending-step.done .step-dot { background: var(--teal); }
+
+  .step-text {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    transition: color 0.3s ease;
+  }
+
+  .sending-step.done .step-text { color: rgba(255,255,255,0.85); }
+
+  .step-lang {
+    margin-left: auto;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.3);
+    font-family: 'DM Mono', monospace;
+    transition: color 0.3s ease;
+  }
+
+  .sending-step.done .step-lang { color: var(--teal); }
+
+  /* ── SHEET SCREEN ── */
+  .sheet-wrap {
+    flex: 1;
+    background: var(--cream);
+    overflow-y: auto;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--white);
+  }
+
+  .header {
+    background: var(--green-deep);
+    padding: 20px 32px 16px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 3px solid var(--gold);
+  }
+
+  .header-left { display: flex; flex-direction: column; gap: 4px; }
+  .brand-row { display: flex; align-items: center; gap: 10px; }
+
+  .brand-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: var(--white);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .brand-sub {
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(201,168,76,0.15);
+    border: 1px solid rgba(201,168,76,0.4);
+    padding: 3px 8px;
+    border-radius: 2px;
+    margin-top: 6px;
+  }
+
+  .ai-dot { width: 5px; height: 5px; background: var(--gold); border-radius: 50%; }
+
+  .ai-badge-text {
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .header-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+
+  .race-date { font-size: 11px; color: rgba(255,255,255,0.55); letter-spacing: 0.05em; }
+  .analyst-credit { font-size: 13px; color: var(--gold); font-weight: 500; }
+
+  .meta-bar {
+    background: var(--green-light);
+    padding: 10px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px 16px;
+    border-right: 1px solid var(--border);
+  }
+
+  .meta-item:nth-child(3) { border-right: none; }
+  .meta-item:nth-child(1) { padding-left: 0; }
+  .meta-label { font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-light); font-weight: 500; }
+  .meta-value { font-size: 12px; font-weight: 600; color: var(--green-deep); }
+
+  .legend-bar {
+    padding: 8px 48px;
+    background: var(--cream);
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--ink-light); }
+
+  .ticket-pill {
+    display: inline-block;
+    background: var(--gold-light);
+    border: 1px solid rgba(201,168,76,0.35);
+    border-radius: 4px;
+    padding: 3px 10px;
+  }
+
+  .ticket-line {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: #7a5a1a;
+    letter-spacing: 0.06em;
+  }
+
+  .content { padding: 16px 32px 20px; }
+  .races-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  @media (max-width: 700px) { .races-grid { grid-template-columns: 1fr; } }
+
+  .race-card { border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: var(--white); }
+
+  .race-header {
+    background: var(--green-deep);
+    padding: 7px 12px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .race-num { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--gold); letter-spacing: 0.15em; text-transform: uppercase; font-weight: 500; }
+  .race-type { font-size: 9px; color: rgba(255,255,255,0.85); }
+  .race-distance { font-family: 'DM Serif Display', serif; font-size: 13px; color: var(--white); }
+
+  .picks-section { padding: 14px 16px 0; }
+
+  .pick-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 5px 0;
+    border-bottom: 0.5px solid var(--border-light);
+    gap: 8px;
+  }
+
+  .pick-row:last-child { border-bottom: none; }
+
+  .pick-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    text-align: center;
+    line-height: 22px;
+    flex-shrink: 0;
+    align-self: flex-start;
+    border-radius: 3px;
+    color: #fff;
+  }
+
+  .pick-info { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .pick-name { font-size: 14px; font-weight: 500; color: var(--ink); line-height: 1.2; }
+  .pick-meta { font-size: 11px; color: var(--ink-light); line-height: 1.1; margin-top: 0; }
+
+  .pick-ml {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-mid);
+    flex-shrink: 0;
+    min-width: 32px;
+    text-align: right;
+  }
+
+  .analysis-section {
+    background: var(--cream);
+    border-top: 1px solid var(--border-light);
+    padding: 10px 16px;
+  }
+
+  .analysis-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-light); font-weight: 600; margin-bottom: 3px; }
+  .analysis-text { font-size: 13px; color: var(--ink-mid); line-height: 1.55; font-style: italic; font-family: 'DM Serif Display', serif; }
+
+  .picks-footer { padding: 8px 16px; border-top: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 4px; }
+  .picks-footer-row { display: flex; align-items: center; gap: 8px; }
+  .footer-label { font-size: 8px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-light); font-weight: 700; flex-shrink: 0; min-width: 52px; }
+
+  .sheet-footer {
+    margin-top: auto;
+    border-top: 2px solid var(--green-light);
+    padding: 10px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--white);
+  }
+
+  .sheet-footer-left { font-size: 9px; color: var(--ink-light); line-height: 1.6; }
+
+  /* ── TRANSITIONS ── */
+  .screen.fade-in { animation: fadeIn 0.5s ease forwards; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .approved-banner {
+    display: none;
+    background: rgba(0,191,166,0.08);
+    border-bottom: 1px solid rgba(0,191,166,0.2);
+    padding: 8px 32px;
+    font-size: 12px;
+    color: var(--teal);
+    letter-spacing: 0.06em;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .approved-banner.show { display: flex; }
+  .approved-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
+
+  /* ── PP SADDLE CLOTH COLORS ── */
+  .pp-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    text-align: center;
+    line-height: 20px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    display: inline-block;
+  }
+  .pp-1  { background: #cc2222; color: #fff; }
+  .pp-2  { background: #ffffff; color: #222; border: 1px solid #bbb; }
+  .pp-3  { background: #1a4fa0; color: #fff; }
+  .pp-4  { background: #e8c325; color: #333; }
+  .pp-5  { background: #1a5c34; color: #fff; }
+  .pp-6  { background: #1a1a1a; color: #fff; }
+  .pp-7  { background: #e07020; color: #fff; }
+  .pp-8  { background: #e060a0; color: #fff; }
+  .pp-9  { background: #1a8888; color: #fff; }
+  .pp-10 { background: #6b35a8; color: #fff; }
+  .pp-11 { background: #888888; color: #fff; }
+  .pp-12 { background: #5aaa6a; color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- DEMO CHROME -->
+<div class="demo-chrome">
+  <div class="demo-step" id="stepLabel"><strong>Step 4 of 7</strong> — Expert Review &amp; Release</div>
+  <div class="demo-pipeline">
+    <div class="pipeline-step done"></div>
+    <div class="pipeline-step done"></div>
+    <div class="pipeline-step done"></div>
+    <div class="pipeline-step active" id="pip4"></div>
+    <div class="pipeline-step" id="pip5"></div>
+    <div class="pipeline-step" id="pip6"></div>
+    <div class="pipeline-step" id="pip7"></div>
+  </div>
+  <div class="demo-badge">Track Intel · Live Demo</div>
+</div>
+
+<!-- ── SCREEN 1: APPROVAL ── -->
+<div class="screen active" id="screenApproval">
+  <div class="approval-wrap">
+    <div class="approval-card">
+
+      <div class="approval-header">
+        <div class="approval-header-left">
+          <div class="approval-logo">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="approval-title">TRACK INTEL</span>
+        </div>
+        <span class="approval-track">MOUNTAINEER · SUN DEC 7</span>
+      </div>
+
+      <div class="approval-intro">
+        <div class="approval-intro-label">Expert Review</div>
+        <p class="approval-intro-text">Sheet is staged and ready. Review your picks below before release. Nothing sends until you approve.</p>
+      </div>
+
+      <div class="best-bet-section">
+        <div class="section-label">Best Bet — Race 6</div>
+        <div class="best-bet-card">
+          <div class="best-bet-top">
+            <span class="best-bet-name">Thirsty John</span>
+            <span class="best-bet-odds">5/2</span>
+          </div>
+          <div class="best-bet-meta">TR: J. Poole — JK: A. Bracho · 5½ Furlongs · Alw 5000s</div>
+          <div class="best-bet-analysis">5 for 7 at Mountaineer. This is his living room. Posted a 95 Beyer here two starts ago. Wire to wire.</div>
+        </div>
+        <div class="send-times">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#999" stroke-width="1"/><path d="M6 3.5V6.5L7.5 8" stroke="#999" stroke-width="1" stroke-linecap="round"/></svg>
+          <span class="send-times-text">Scheduled: 6:30 AM ET · 7:30 AM BRT · 12:30 PM CET</span>
+        </div>
+      </div>
+
+      <div class="races-section">
+        <div class="section-label">All Races — Top Pick</div>
+        <div class="race-list">
+          <div class="race-item"><div class="race-item-left"><span class="race-num-label">R1</span><span class="pp-badge pp-3">3</span><span class="race-pick-name">Redwhiteandtacos</span></div><span class="race-pick-odds">5/2</span></div>
+          <div class="race-item"><div class="race-item-left"><span class="race-num-label">R2</span><span class="pp-badge pp-9">9</span><span class="race-pick-name">Dreaming of Hope</span></div><span class="race-pick-odds">5/2</span></div>
+          <div class="race-item"><div class="race-item-left"><span class="race-num-label">R3</span><span class="pp-badge pp-7">7</span><span class="race-pick-name">Spuns Kitten</span></div><span class="race-pick-odds">5/2</span></div>
+          <div class="race-item"><div class="race-item-left"><span class="race-num-label">R4</span><span class="pp-badge pp-5">5</span><span class="race-pick-name">Vanilla Cream</span></div><span class="race-pick-odds">4/1</span></div>
+          <div class="race-item" style="background:rgba(201,168,76,0.06);border:0.5px solid rgba(201,168,76,0.2);"><div class="race-item-left"><span class="race-num-label" style="color:var(--gold);">R6★</span><span class="pp-badge pp-2">2</span><span class="race-pick-name" style="font-weight:600;">Thirsty John</span></div><span class="race-pick-odds" style="color:var(--gold);">5/2</span></div>
+          <div class="race-more"><span>+ 3 more races</span><span>view full sheet →</span></div>
+        </div>
+      </div>
+
+      <div class="approval-actions">
+        <div class="action-buttons">
+          <button class="btn-approve" id="btnApprove" onclick="handleApprove()">Approve</button>
+          <button class="btn-flag">Flag change</button>
+          <button class="btn-hold">Hold</button>
+        </div>
+        <p class="status-msg" id="statusMsg">–</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── SCREEN 2: SENDING ── -->
+<div class="screen" id="screenSending">
+  <div class="sending-wrap">
+    <div class="sending-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13" stroke="#00bfa6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="#00bfa6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="sending-title">Approved.<br><em>Pipeline running.</em></div>
+    <div class="sending-steps">
+      <div class="sending-step" id="ss1"><div class="step-dot"></div><span class="step-text">Generating layout</span><span class="step-lang">EN</span></div>
+      <div class="sending-step" id="ss2"><div class="step-dot"></div><span class="step-text">Translating — Spanish</span><span class="step-lang">ES</span></div>
+      <div class="sending-step" id="ss3"><div class="step-dot"></div><span class="step-text">Translating — Portuguese</span><span class="step-lang">PT</span></div>
+      <div class="sending-step" id="ss4"><div class="step-dot"></div><span class="step-text">Scheduling sends · ET / BRT / CET</span><span class="step-lang">3×</span></div>
+      <div class="sending-step" id="ss5"><div class="step-dot"></div><span class="step-text">Delivering to subscribers</span><span class="step-lang">✓</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCREEN 3: SHEET ── -->
+<div class="screen" id="screenSheet">
+  <div class="approved-banner show">
+    <div class="approved-dot"></div>
+    Approved by Brad Killmeyer · Sent 6:30 AM ET · 7:30 AM BRT · 12:30 PM CET
+  </div>
+  <div class="sheet-wrap">
+    <div class="page">
+
+      <div class="header">
+        <div class="header-left">
+          <div class="brand-row">
+            <div>
+              <div class="brand-name">The Shortcut Sheet</div>
+              <div class="brand-sub">Inside Track Racing · Brad Killmeyer</div>
+            </div>
+          </div>
+          <div class="ai-badge">
+            <div class="ai-dot"></div>
+            <div class="ai-badge-text">AI-assisted analysis · Human-curated picks</div>
+          </div>
+        </div>
+        <div class="header-right">
+          <img src="https://cdn.prod.website-files.com/6852c91a4f0d66a5dfcc609c/69c29d344f6abcbe23ea6491_mountaineer-logo-white.svg" width="130" height="53" alt="Mountaineer Casino Resort Races" />
+          <div class="race-date">Sunday, December 7, 2025</div>
+          <div class="analyst-credit">Brad@InsideTrackRacing.com</div>
+        </div>
+      </div>
+
+      <div class="meta-bar">
+        <div class="meta-item"><span class="meta-label">Post Time</span><span class="meta-value">7:00 PM ET</span></div>
+        <div class="meta-item"><span class="meta-label">Card Profile</span><span class="meta-value" style="color:#3d7a5e;">Favors favorites · Low variance</span></div>
+        <div class="meta-item"><span class="meta-label">Best Bet</span><span class="meta-value">R6 Thirsty John</span></div>
+      </div>
+
+      <div class="legend-bar">
+        <div class="legend-item" style="color:var(--gold)">★ = Best Bet race</div>
+        <div style="flex:1"></div>
+        <div class="legend-item"><div class="ticket-pill"><span class="ticket-line" style="font-size:10px;">Pick 4 &amp; 5 Suggestions</span></div></div>
+      </div>
+
+      <div class="content">
+        <div class="races-grid">
+
+          <!-- RACE 1 -->
+          <div class="race-card">
+            <div class="race-header"><div><div class="race-num">Race 1</div><div class="race-distance">1 Mile · Alw 4000s · F&amp;M</div></div><div class="race-type">$14,000 purse</div></div>
+            <div class="picks-section">
+              <div class="pick-row"><div class="pick-number pp-3">3</div><div class="pick-info"><div class="pick-name">Redwhiteandtacos</div><div class="pick-meta">TR: J. Bernardini - JK: E. Barbaran</div></div><div class="pick-ml">5/2</div></div>
+              <div class="pick-row"><div class="pick-number pp-2">2</div><div class="pick-info"><div class="pick-name">Accelerina</div><div class="pick-meta">TR: J. Vazquez - JK: M.Y. Pagan</div></div><div class="pick-ml">7/2</div></div>
+              <div class="pick-row"><div class="pick-number pp-4">4</div><div class="pick-info"><div class="pick-name">Princess Halime</div><div class="pick-meta">TR: S. Yoder - JK: E. Greenidge</div></div><div class="pick-ml">3/1</div></div>
+              <div class="pick-row"><div class="pick-number pp-7">7</div><div class="pick-info"><div class="pick-name">Xhilaratingpurpose</div><div class="pick-meta">TR: R. Blackhurst - JK: D. Parker</div></div><div class="pick-ml">6/1</div></div>
+            </div>
+            <div class="analysis-section"><div class="analysis-label">Brad's read</div><div class="analysis-text">Redwhiteandtacos drew clear last out and Bernardini fires at 21% on winners. Accelerina fits perfectly off two MNR wins. Key: pace battle heats up: the horse that controls it wins.</div></div>
+            <div class="picks-footer"><div class="picks-footer-row"><span class="footer-label">Pick 4</span><div class="ticket-pill"><span class="ticket-line">3/9/7/5</span></div></div></div>
+          </div>
+
+          <!-- RACE 2 -->
+          <div class="race-card">
+            <div class="race-header"><div><div class="race-num">Race 2</div><div class="race-distance">6 Furlongs · Clm 20000B · F&amp;M</div></div><div class="race-type">$16,000 purse</div></div>
+            <div class="picks-section">
+              <div class="pick-row"><div class="pick-number pp-9">9</div><div class="pick-info"><div class="pick-name">Dreaming of Hope</div><div class="pick-meta">TR: J. Bernardini - JK: L. Negron</div></div><div class="pick-ml">5/2</div></div>
+              <div class="pick-row"><div class="pick-number pp-8">8</div><div class="pick-info"><div class="pick-name">Kozem</div><div class="pick-meta">TR: J. Poole - JK: Y. Aviles</div></div><div class="pick-ml">4/1</div></div>
+              <div class="pick-row"><div class="pick-number pp-1">1</div><div class="pick-info"><div class="pick-name">Waterworks</div><div class="pick-meta">TR: E. Clouston - JK: E. Paucar</div></div><div class="pick-ml">8/1</div></div>
+              <div class="pick-row"><div class="pick-number pp-4">4</div><div class="pick-info"><div class="pick-name">Popstyle</div><div class="pick-meta">TR: J. Vazquez - JK: M.Y. Pagan</div></div><div class="pick-ml">7/2</div></div>
+            </div>
+            <div class="analysis-section"><div class="analysis-label">Brad's read</div><div class="analysis-text">Dreaming of Hope ships in off three straight wins, now with Bernardini. That's a live combo. Kozem just dominated MNR at 91 Beyer. Popstyle showed class at GP; pace will be hot.</div></div>
+          </div>
+
+          <!-- RACE 3 -->
+          <div class="race-card">
+            <div class="race-header"><div><div class="race-num">Race 3</div><div class="race-distance">5½ Furlongs · OC 12k/C · WV-bred F&amp;M</div></div><div class="race-type">$19,000 purse</div></div>
+            <div class="picks-section">
+              <div class="pick-row"><div class="pick-number pp-7">7</div><div class="pick-info"><div class="pick-name">Spuns Kitten</div><div class="pick-meta">TR: J. Shuler - JK: K. Gonzalez</div></div><div class="pick-ml">5/2</div></div>
+              <div class="pick-row"><div class="pick-number pp-2">2</div><div class="pick-info"><div class="pick-name">Flying to Neptune</div><div class="pick-meta">TR: A. Farrior - JK: E. Barbaran</div></div><div class="pick-ml">4/1</div></div>
+              <div class="pick-row"><div class="pick-number pp-1">1</div><div class="pick-info"><div class="pick-name">Shotgun Margaret</div><div class="pick-meta">TR: J. Shuler - JK: M.Y. Pagan</div></div><div class="pick-ml">7/2</div></div>
+              <div class="pick-row"><div class="pick-number pp-4">4</div><div class="pick-info"><div class="pick-name">Holly Roller</div><div class="pick-meta">TR: J. Shuler - JK: K. Gonzalez</div></div><div class="pick-ml">9/2</div></div>
+            </div>
+            <div class="analysis-section"><div class="analysis-label">Brad's read</div><div class="analysis-text">Spuns Kitten crushed a maiden field by 10, now stepping to OC company but pace figure is elite for this level. Farrior's Flying to Neptune won last at CT; dangerous price.</div></div>
+          </div>
+
+          <!-- RACE 4 -->
+          <div class="race-card">
+            <div class="race-header"><div><div class="race-num">Race 4</div><div class="race-distance">4½ Furlongs · Mdn Clm 4000 · F&amp;M</div></div><div class="race-type">$8,000 purse</div></div>
+            <div class="picks-section">
+              <div class="pick-row"><div class="pick-number pp-5">5</div><div class="pick-info"><div class="pick-name">Vanilla Cream</div><div class="pick-meta">TR: J. Bernardini - JK: E. Barbaran</div></div><div class="pick-ml">4/1</div></div>
+              <div class="pick-row"><div class="pick-number pp-3">3</div><div class="pick-info"><div class="pick-name">Rosie Ann Rules</div><div class="pick-meta">TR: J. Silva - JK: L. Negron</div></div><div class="pick-ml">9/2</div></div>
+              <div class="pick-row"><div class="pick-number pp-9">9</div><div class="pick-info"><div class="pick-name">Stanford Hottie</div><div class="pick-meta">TR: J. Silva - JK: M.Y. Pagan</div></div><div class="pick-ml">7/2</div></div>
+              <div class="pick-row"><div class="pick-number pp-1">1</div><div class="pick-info"><div class="pick-name">Smoove Over</div><div class="pick-meta">TR: J. Silva - JK: D. Parker</div></div><div class="pick-ml">12/1</div></div>
+            </div>
+            <div class="analysis-section"><div class="analysis-label">Brad's read</div><div class="analysis-text">Vanilla Cream showed willing second at PID. Step down makes her live. Rosie Ann Rules ships from Santa Anita maiden 50k. Silva/Negron first-timer combo is sharp.</div></div>
+            <div class="picks-footer"><div class="picks-footer-row"><span class="footer-label">Pick 5</span><div class="ticket-pill"><span class="ticket-line">5/7/2/6/8</span></div></div></div>
+          </div>
+
+          <!-- RACE 5 -->
+          <div class="race-card">
+            <div class="race-header"><div><div class="race-num">Race 5</div><div class="race-distance">1 Mile · Clm 7500N2X · F&amp;M</div></div><div class="race-type">$9,000 purse</div></div>
+            <div class="picks-section">
+              <div class="pick-row"><div class="pick-number pp-7">7</div><div class="pick-info"><div class="pick-name">Co Heart</div><div class="pick-meta">TR: J. Silva - JK: L. Negron</div></div><div class="pick-ml">3/1</div></div>
+              <div class="pick-row"><div class="pick-number pp-8">8</div><div class="pick-info"><div class="pick-name">Handle On You</div><div class="pick-meta">TR: J. Vazquez - JK: M.Y. Pagan</div></div><div class="pick-ml">7/2</div></div>
+              <div class="pick-row"><div class="pick-number pp-5">5</div><div class="pick-info"><div class="pick-name">All for Honor</div><div class="pick-meta">TR: A. Robillard - JK: D. Parker</div></div><div class="pick-ml">6/1</div></div>
+              <div class="pick-row"><div class="pick-number pp-10">10</div><div class="pick-info"><div class="pick-name">Tango Zulu</div><div class="pick-meta">TR: M. Valdez - JK: R. Diaz</div></div><div class="pick-ml">15/1</div></div>
+            </div>
+            <div class="analysis-section"><div class="analysis-label">Brad's read</div><div class="analysis-text">Co Heart dominated MNR maiden by 8+ then stepped up, now with Silva/Negron who connect at 35% here. Handle On You drops from NY $17.5k claiming; Vazquez at 31% J/T MNR.</div></div>
+            <div class="picks-footer"><div class="picks-footer-row"><span class="footer-label">Pick 4</span><div class="ticket-pill"><span class="ticket-line">7/2/6/8</span></div></div></div>
+          </div>
+
+          <!-- RACE 6 BEST BET -->
+          <div class="race-card" style="border-color:var(--gold);border-width:2px;">
+            <div class="race-header" style="background:var(--green-mid);">
+              <div><div class="race-num"><span style="font-size:10px;color:var(--gold);">★</span> Race 6 — Best Bet</div><div class="race-distance">5½ Furlongs · Alw 5000s · 3YO+</div></div>
+              <div class="race-type">$14,500 purse</div>
+            </div>
+            <div class="picks-section">
+              <div class="pick-row"><div class="pick-number pp-2">2</div><div class="pick-info"><div class="pick-name">Thirsty John</div><div class="pick-meta">TR: J. Poole - JK: A. Bracho</div></div><div class="pick-ml">5/2</div></div>
+              <div class="pick-row"><div class="pick-number pp-10">10</div><div class="pick-info"><div class="pick-name">Boudin</div><div class="pick-meta">TR: J. Bernardini - JK: Y. Aviles</div></div><div class="pick-ml">12/1</div></div>
+              <div class="pick-row"><div class="pick-number pp-6">6</div><div class="pick-info"><div class="pick-name">Poseidon's Son</div><div class="pick-meta">TR: J. Bernardini - JK: E. Barbaran</div></div><div class="pick-ml">9/2</div></div>
+              <div class="pick-row"><div class="pick-number pp-4">4</div><div class="pick-info"><div class="pick-name">Tidal Current</div><div class="pick-meta">TR: J. Bernardini - JK: L. Negron</div></div><div class="pick-ml">8/1</div></div>
+            </div>
+            <div class="analysis-section" style="background:#f5f0e2;border-top:1px solid var(--gold);"><div class="analysis-label" style="color:var(--gold);">Brad's best bet</div><div class="analysis-text">Thirsty John is 5 for 7 at Mountaineer. This is his living room. Posted a 95 Beyer here two starts ago. Won at 5/2 last race, connections stick. Wire to wire.</div></div>
+          </div>
+
+          <!-- RACE 7 -->
+          <div class="race-card">
+            <div class="race-header"><div><div class="race-num">Race 7</div><div class="race-distance">6 Furlongs · Clm 20000B · 3YO+</div></div><div class="race-type">$16,000 purse</div></div>
+            <div class="picks-section">
+              <div class="pick-row"><div class="pick-number pp-6">6</div><div class="pick-info"><div class="pick-name">Captivated Drama</div><div class="pick-meta">TR: K. Joy - JK: E. Barbaran</div></div><div class="pick-ml">5/2</div></div>
+              <div class="pick-row"><div class="pick-number pp-2">2</div><div class="pick-info"><div class="pick-name">Dance Code</div><div class="pick-meta">TR: J. Vazquez - JK: K. Gonzalez</div></div><div class="pick-ml">7/2</div></div>
+              <div class="pick-row"><div class="pick-number pp-8">8</div><div class="pick-info"><div class="pick-name">Fivefive Six Champ</div><div class="pick-meta">TR: J. Bernardini - JK: B. Tapara</div></div><div class="pick-ml">6/1</div></div>
+              <div class="pick-row"><div class="pick-number pp-3">3</div><div class="pick-info"><div class="pick-name">Mystic Warrior</div><div class="pick-meta">TR: J. Silva - JK: L. Negron</div></div><div class="pick-ml">10/1</div></div>
+            </div>
+            <div class="analysis-section"><div class="analysis-label">Brad's read</div><div class="analysis-text">Captivated Drama posted a 92 Beyer at Mountaineer last out. Dominant. Wire speed at 115 early pace is elite for 20k claiming. Dance Code is the closer with a 79 Beyer lurking.</div></div>
+          </div>
+
+          <!-- RACE 8 -->
+          <div class="race-card">
+            <div class="race-header"><div><div class="race-num">Race 8</div><div class="race-distance">5½ Furlongs · Clm 4000B · 3YO+</div></div><div class="race-type">$9,500 purse</div></div>
+            <div class="picks-section">
+              <div class="pick-row"><div class="pick-number pp-8">8</div><div class="pick-info"><div class="pick-name">Funny Joke</div><div class="pick-meta">TR: J. Vazquez - JK: M.Y. Pagan</div></div><div class="pick-ml">10/1</div></div>
+              <div class="pick-row"><div class="pick-number pp-5">5</div><div class="pick-info"><div class="pick-name">Beyond the Bend</div><div class="pick-meta">TR: E. Clouston - JK: Y. Aviles</div></div><div class="pick-ml">7/2</div></div>
+              <div class="pick-row"><div class="pick-number pp-2">2</div><div class="pick-info"><div class="pick-name">Bustin Loose</div><div class="pick-meta">TR: R. Bayley - JK: J. Stokes</div></div><div class="pick-ml">9/2</div></div>
+              <div class="pick-row"><div class="pick-number pp-6">6</div><div class="pick-info"><div class="pick-name">Final Chapter</div><div class="pick-meta">TR: J. Poole - JK: A. Bracho</div></div><div class="pick-ml">6/1</div></div>
+            </div>
+            <div class="analysis-section"><div class="analysis-label">Brad's read</div><div class="analysis-text">Funny Joke drops into $4k off a win at this distance. Vazquez/Pagan connect at 31% here. Beyond the Bend won at MNR at even money, stepping back in class. Tight finish likely.</div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="sheet-footer">
+        <div class="sheet-footer-left">
+          Selections represent the analyst's opinion only. Past performance does not guarantee future results.<br>
+          Always gamble responsibly · West Virginia Council on Problem Gambling: 1-800-522-4700
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function handleApprove() {
+  const btn = document.getElementById('btnApprove');
+  const msg = document.getElementById('statusMsg');
+  btn.classList.add('pressed');
+  btn.textContent = 'Approved ✓';
+  btn.style.pointerEvents = 'none';
+  msg.textContent = 'Approved. Pipeline running…';
+  msg.classList.add('show');
+
+  setTimeout(() => {
+    showScreen('screenSending');
+    updateChrome('Steps 5–7 of 7', 'Building · Translating · Sending');
+
+    document.getElementById('pip4').classList.remove('active');
+    document.getElementById('pip4').classList.add('done');
+    document.getElementById('pip5').classList.add('active');
+
+    const steps = ['ss1','ss2','ss3','ss4','ss5'];
+    steps.forEach((id, i) => {
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        el.classList.add('vis');
+        setTimeout(() => {
+          el.classList.add('done');
+          if (i === 1) {
+            document.getElementById('pip5').classList.remove('active');
+            document.getElementById('pip5').classList.add('done');
+            document.getElementById('pip6').classList.add('active');
+          }
+          if (i === 3) {
+            document.getElementById('pip6').classList.remove('active');
+            document.getElementById('pip6').classList.add('done');
+            document.getElementById('pip7').classList.add('active');
+          }
+        }, 500);
+      }, i * 600);
+    });
+
+    setTimeout(() => {
+      document.getElementById('pip7').classList.remove('active');
+      document.getElementById('pip7').classList.add('done');
+      updateChrome('Complete', 'Sheet delivered · 3 markets · 3 languages');
+      setTimeout(() => {
+        showScreen('screenSheet');
+      }, 600);
+    }, steps.length * 600 + 800);
+
+  }, 700);
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'fade-in'));
+  const el = document.getElementById(id);
+  el.classList.add('active', 'fade-in');
+  window.scrollTo(0, 0);
+}
+
+function updateChrome(step, label) {
+  document.getElementById('stepLabel').innerHTML = `<strong>${step}</strong> — ${label}`;
+}
+</script>
+
+</body>
+</html>
