@@ -776,8 +776,12 @@
       <div class="approval-actions">
         <div class="action-buttons">
           <button class="btn-approve" id="btnApprove" onclick="handleApprove()">Approve</button>
-          <button class="btn-flag">Flag change</button>
-          <button class="btn-hold">Hold</button>
+          <button class="btn-flag" id="btnFlag" onclick="handleFlag()">Flag change</button>
+          <button class="btn-hold" id="btnHold" onclick="handleHold()">Hold</button>
+        </div>
+        <div id="flagInput" style="display:none; margin-bottom:10px;">
+          <input id="flagText" type="text" placeholder="Describe the change needed…" style="width:100%; font-size:13px; padding:8px 12px; border-radius:8px; border:0.5px solid rgba(0,0,0,0.2); background:#f9f9f7; color:#0a0a0a; font-family:'Instrument Sans',sans-serif; outline:none;" />
+          <button onclick="submitFlag()" style="margin-top:6px; width:100%; padding:9px; border-radius:8px; border:1px solid #e07020; background:transparent; color:#e07020; font-size:13px; font-weight:500; cursor:pointer; font-family:'Instrument Sans',sans-serif;">Send flag →</button>
         </div>
         <p class="status-msg" id="statusMsg">–</p>
       </div>
@@ -1014,7 +1018,60 @@ function handleApprove() {
   }, 700);
 }
 
-function showScreen(id) {
+function handleFlag() {
+  const input = document.getElementById('flagInput');
+  const btn = document.getElementById('btnFlag');
+  const msg = document.getElementById('statusMsg');
+  const isOpen = input.style.display === 'block';
+  input.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    btn.style.borderColor = '#e07020';
+    btn.style.color = '#e07020';
+    document.getElementById('flagText').focus();
+    msg.textContent = '';
+    msg.style.color = 'transparent';
+  } else {
+    btn.style.borderColor = '';
+    btn.style.color = '';
+  }
+}
+
+function submitFlag() {
+  const text = document.getElementById('flagText').value.trim();
+  const msg = document.getElementById('statusMsg');
+  const btn = document.getElementById('btnFlag');
+  if (!text) {
+    document.getElementById('flagText').style.borderColor = '#cc2222';
+    return;
+  }
+  document.getElementById('flagInput').style.display = 'none';
+  btn.textContent = 'Flagged ⚑';
+  btn.style.borderColor = '#e07020';
+  btn.style.color = '#e07020';
+  btn.style.pointerEvents = 'none';
+  msg.textContent = 'Change flagged. Sheet held pending update.';
+  msg.style.color = '#e07020';
+  msg.classList.add('show');
+  updateChrome('Step 4 of 7', 'Change flagged — awaiting revision');
+}
+
+function handleHold() {
+  const btn = document.getElementById('btnHold');
+  const msg = document.getElementById('statusMsg');
+  const flagInput = document.getElementById('flagInput');
+  // close flag input if open
+  flagInput.style.display = 'none';
+  document.getElementById('btnFlag').style.borderColor = '';
+  document.getElementById('btnFlag').style.color = '';
+  btn.textContent = 'Held ✕';
+  btn.style.borderColor = 'rgba(0,0,0,0.3)';
+  btn.style.color = '#888';
+  btn.style.pointerEvents = 'none';
+  msg.textContent = 'Sheet held. No sends scheduled.';
+  msg.style.color = '#888';
+  msg.classList.add('show');
+  updateChrome('Step 4 of 7', 'Sheet held — no distribution');
+}
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'fade-in'));
   const el = document.getElementById(id);
   el.classList.add('active', 'fade-in');
