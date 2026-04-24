@@ -1072,6 +1072,8 @@ function handleHold() {
   msg.classList.add('show');
   updateChrome('Step 4 of 7', 'Sheet held — no distribution');
 }
+
+function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'fade-in'));
   const el = document.getElementById(id);
   el.classList.add('active', 'fade-in');
